@@ -1,0 +1,7 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_test")
+
+go_test(
+    name = "rpc_test",
+    srcs = ["rpc_test.go"],
+    deps = ["//src/go/host/rpc"],
+)

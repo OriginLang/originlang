@@ -1,0 +1,27 @@
+# Bazel
+/bazel-*
+/MODULE.bazel.lock
+
+# Build outputs (fallback if output_base is inside the workspace)
+bazel-bin/
+bazel-out/
+bazel-testlogs/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+
+# Rust
+target/
+
+# Node
+node_modules/

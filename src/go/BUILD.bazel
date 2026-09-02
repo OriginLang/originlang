@@ -1,0 +1,21 @@
+load("@gazelle//:def.bzl", "gazelle")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+# gazelle:prefix originlang
+gazelle(name = "gazelle")
+
+go_library(
+    name = "host",
+    srcs = [],
+    importpath = "originlang/host",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//src/go/host/manager",
+        "//src/go/host/plugin",
+        "//src/go/host/rpc",
+        "//src/go/host/sdk",
+        "//src/go/host/transport",
+        "//src/go/host/transport/stdio",
+        "//src/go/host/transport/tcp",
+    ],
+)

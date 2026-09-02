@@ -1,0 +1,12 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "tcp",
+    srcs = ["tcp.go"],
+    importpath = "originlang/host/transport/tcp",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//src/go/host/rpc",
+        "//src/go/host/transport",
+    ],
+)

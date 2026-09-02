@@ -1,0 +1,10 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_test")
+
+go_test(
+    name = "stdio_test",
+    srcs = ["stdio_test.go"],
+    deps = [
+        "//src/go/host/rpc",
+        "//src/go/host/transport/stdio",
+    ],
+)

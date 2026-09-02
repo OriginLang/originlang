@@ -1,0 +1,12 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "rpc",
+    srcs = [
+        "error.go",
+        "id.go",
+        "rpc.go",
+    ],
+    importpath = "originlang/host/rpc",
+    visibility = ["//visibility:public"],
+)

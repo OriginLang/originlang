@@ -1,0 +1,10 @@
+# Common Bazel settings for the originlang workspace.
+
+# Show more verbose test output on failure.
+test --test_output=errors
+
+# C++ standard (uncomment/adjust as needed)
+# build --cxxopt=-std=c++17
+
+# Python version used by rules_python.
+build --python_version=3.11
