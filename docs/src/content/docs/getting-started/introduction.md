@@ -66,4 +66,4 @@ Existing plugin platforms each leave holes — a frozen long-tail of SDKs, a sin
 
 ## Current status
 
-The repository currently provides the directory skeleton for the runtime (`core`, `services`, `ipc`, and `host-api`), execution engine, adapters, SDKs, CLI, modules, plugins, examples, the [Gateway](../architecture/gateway/), and the [Developer Kit](../reference/developer-kit/). These boundaries guide implementation; concrete language SDKs and deployable hosts are added as their contracts land. Start with the [Project Structure](project-structure/) tour.
+The repository currently provides the directory skeleton for the runtime (`core`, `services`, `ipc`, and `host-api`), execution engine, adapters, SDKs, CLI, modules, plugins, examples, Gateway, and the [Developer Kit](../reference/developer-kit/). Concrete language SDKs and deployable hosts are added as their public contracts land. Start with the [Project Structure](project-structure/) tour.

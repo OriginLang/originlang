@@ -76,5 +76,5 @@ The host would perform lookup and lifecycle checks, forward the request over the
 ## Next steps
 
 - Explore the [project structure](project-structure/) to find your way around.
-- Read the [architecture](../architecture/overview/) to see how it all fits.
+- Use the stable reference contracts when integrating a host or plugin.
 - Start [writing a plugin](../guides/write-a-plugin/).

@@ -66,4 +66,4 @@ OriginLang 是一个**支持多语言、插件化的通用平台底座**。它�
 
 ## 当前状态
 
-仓库当前提供运行时（`core`、`services`、`ipc`、`host-api`）、执行引擎、适配器、SDK、CLI、模块、插件、示例、[网关](../architecture/gateway/)与[开发者工具包](../reference/developer-kit/)的目录骨架。这些边界用于指导后续实现；具体语言 SDK 与可部署宿主会随其公开契约一起落地。请先阅读[项目结构](project-structure/)。
+仓库当前提供运行时（`core`、`services`、`ipc`、`host-api`）、执行引擎、适配器、SDK、CLI、模块、插件、示例、Gateway 与[开发者工具包](../reference/developer-kit/)的目录骨架。具体语言 SDK 与可部署宿主会随其公开契约一起落地。请先阅读[项目结构](project-structure/)。

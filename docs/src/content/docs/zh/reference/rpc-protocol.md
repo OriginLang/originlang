@@ -99,4 +99,4 @@ description: 所有宿主–插件通信使用的 JSON-RPC 2.0 线上协议。
 | TCP | 套接字上的换行分隔 JSON |
 | HTTP（未来） | HTTP POST 的 JSON body |
 
-完整矩阵见[传输层](../architecture/transports/)。
+具体支持的传输由宿主发行物决定。

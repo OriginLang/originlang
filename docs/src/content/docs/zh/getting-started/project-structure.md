@@ -44,7 +44,7 @@ originlang/
 | `modules/` | 可独立发布与版本化的官方模块。 |
 | `plugins/` | OriginLang 团队维护的官方插件。 |
 | `examples/` | 可运行的宿主与插件示例。 |
-| `gateway/` | 统一入口层：把 HTTP、gRPC、WebSocket、本地 IPC 与 CLI 调用适配为统一的请求模型，转交宿主的稳定服务接口。见[网关](../architecture/gateway/)。 |
+| `gateway/` | 统一入口层：将外部调用转交给宿主的稳定服务接口。 |
 | `apps/` | 最终可执行入口点：CLI 工具与独立程序，每个子目录对应一个可运行程序。 |
 | `services/` | 可部署的网络服务与守护进程，每个子目录可独立部署。 |
 | `tests/` | 单元与集成测试，与运行时布局一一对应。 |

@@ -81,7 +81,7 @@ A plugin package describes itself with a **manifest** at its root — the single
 
 ### Artifacts
 
-Declares which plugin carriers are available. The runtime picks one by the [transport selection rules](../architecture/transports/):
+Declares which plugin carriers are available. The runtime selects a compatible carrier from the manifest:
 
 - `wasm` — a WASI/Component Model module (default, cross-language + safe).
 - `binary` — platform-specific native libraries (`.so` / `.dylib` / `.dll`).

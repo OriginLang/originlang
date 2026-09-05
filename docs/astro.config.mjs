@@ -38,32 +38,6 @@ export default defineConfig({
 					],
 				},
 				{
-					label: 'Architecture',
-					translations: { zh: '架构' },
-					items: [
-						{
-							label: 'Layered Architecture',
-							translations: { zh: '分层架构' },
-							link: 'architecture/overview',
-						},
-						{
-							label: 'Go Host Kernel',
-							translations: { zh: 'Go 宿主内核' },
-							link: 'architecture/host-kernel',
-						},
-						{
-							label: 'Transports',
-							translations: { zh: '传输层' },
-							link: 'architecture/transports',
-						},
-						{
-							label: 'Gateway',
-							translations: { zh: '网关' },
-							link: 'architecture/gateway',
-						},
-					],
-				},
-				{
 					label: 'Guides',
 					translations: { zh: '指南' },
 					items: [
@@ -124,11 +98,6 @@ export default defineConfig({
 							link: 'reference/developer-kit',
 						},
 					],
-				},
-				{
-					label: 'Roadmap',
-					translations: { zh: '路线图' },
-					link: 'roadmap',
 				},
 			],
 		}),

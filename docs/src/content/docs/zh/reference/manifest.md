@@ -81,7 +81,7 @@ description: 插件清单声明身份、产物、能力与扩展贡献。
 
 ### 产物
 
-声明可用的插件载体。运行时按[传输选择规则](../architecture/transports/)选定其一：
+声明可用的插件载体。运行时根据 manifest 选择兼容载体：
 
 - `wasm`——WASI/Component Model 模块（默认，跨语言且安全）。
 - `binary`——平台特定原生库（`.so` / `.dylib` / `.dll`）。

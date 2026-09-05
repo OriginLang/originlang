@@ -44,7 +44,7 @@ originlang/
 | `modules/` | Officially versioned modules that can be released and versioned independently. |
 | `plugins/` | Official plugins maintained by the OriginLang team. |
 | `examples/` | Runnable example hosts and plugins. |
-| `gateway/` | The unified entry layer: adapts HTTP, gRPC, WebSocket, local IPC, and CLI calls into one request model for the host's stable services. See the [Gateway](../architecture/gateway/) page. |
+| `gateway/` | The unified entry layer: adapts external calls into the host's stable services. |
 | `apps/` | Final executable entry points: CLI tools and standalone programs. Each subdirectory is one runnable program. |
 | `services/` | Deployable network services and daemons. Each subdirectory is independently deployable. |
 | `tests/` | Unit and integration tests, mirroring the runtime layout. |

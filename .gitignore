@@ -25,3 +25,6 @@ target/
 
 # Node
 node_modules/
+
+# Internal architecture and product-planning documents are maintained separately.
+/docs-private/

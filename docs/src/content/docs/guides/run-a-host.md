@@ -29,5 +29,5 @@ This keeps product entry points thin and lets multiple hosts reuse the same runt
 
 ## Next steps
 
-- Review the [Runtime Kernel](../architecture/host-kernel/) boundary.
+- Keep integrations within the documented public contracts.
 - Review [Project Structure](../getting-started/project-structure/) before adding a service.

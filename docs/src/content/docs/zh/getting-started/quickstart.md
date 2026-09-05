@@ -76,5 +76,5 @@ bazel query //...
 ## 下一步
 
 - 查看[项目结构](project-structure/)，熟悉仓库布局。
-- 阅读[架构](../architecture/overview/)，看各部分如何协同。
+- 集成宿主或插件时，请以稳定的参考契约为准。
 - 开始[编写一个插件](../guides/write-a-plugin/)。

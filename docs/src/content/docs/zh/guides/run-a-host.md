@@ -29,5 +29,5 @@ description: 如何按 OriginLang 分层组合可部署宿主。
 
 ## 下一步
 
-- 阅读[运行时内核](../architecture/host-kernel/)的边界说明。
+- 集成时遵循已公开的稳定契约。
 - 新增服务前阅读[项目结构](../getting-started/project-structure/)。

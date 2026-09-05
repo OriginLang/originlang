@@ -99,4 +99,4 @@ The JSON-RPC envelope is identical across all transports. Only the framing mediu
 | TCP | newline-delimited JSON over a socket |
 | HTTP (future) | JSON body over HTTP POST |
 
-See [Transports](../architecture/transports/) for the full matrix.
+Supported transport availability is determined by the host distribution.
