@@ -1,0 +1,68 @@
+---
+title: OriginLang
+description: 支持多语言、插件化的通用平台应用底座。
+template: splash
+hero:
+  tagline: 支持多语言、插件化的通用平台应用底座。用你熟悉的语言编写插件，构建可扩展的 SaaS 平台、开发者工具、AI 工作台等。
+  actions:
+    - text: 快速开始
+      link: /zh/getting-started/introduction/
+      icon: right-arrow
+    - text: 查看 GitHub
+      link: https://github.com/OriginLang/originlang
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## 什么是 OriginLang？
+
+OriginLang 是一个**支持多语言、插件化的通用平台底座**。任何团队/个人在构建产品（SaaS 平台、开发者工具、AI 工作台、企业中台、桌面/移动应用……）时，都能基于 OriginLang 获得：
+
+- **多语言写插件**：插件开发者可用 Go / Rust / Java / Python / C++ / TypeScript 六大主流语言任选其一写后端逻辑插件，用 TS/JS + 主流前端框架写 UI 扩展；
+- **多语言写宿主**：平台宿主程序同样可选上述六大语言嵌入 OriginLang 内核；
+- **动态插件市场级能力**：运行时热加载/热更新/热卸载、依赖解析、细粒度权限、插件市场分发；
+- **SaaS 原生多租户**：租户级插件可见性、配额、计费计量、故障隔离；
+- **一体前后端扩展**：一个插件包同时声明后端 API 与前端组件/菜单/路由，宿主零代码注入。
+
+## 核心设计原则
+
+<CardGrid stagger>
+	<Card title="语言无关优先" icon="puzzle">
+		SDK 六语言齐平发布，绝无单一语言锁定。
+	</Card>
+	<Card title="协议与传输解耦" icon="arrow-swap">
+		一种 JSON-RPC 2.0 协议，跑在 stdio / TCP / HTTP / 未来 Wasm IPC 四种传输上。
+	</Card>
+	<Card title="统一生命周期" icon="circle-check">
+		Wasm 沙箱、子进程、原生动态库、远程服务四种插件载体共用一个生命周期。
+	</Card>
+	<Card title="Deny-by-Default 安全" icon="shield">
+		细粒度能力声明 + 租户授权 + 用户策略 + 资源配额，三层权限体系。
+	</Card>
+	<Card title="多租户一等公民" icon="group">
+		仓库可见性、实例隔离、配额计量内建支持，而非事后打补丁。
+	</Card>
+	<Card title="零配置可观测性" icon="pulse">
+		插件级指标、日志、追踪无需手写插桩即可接入。
+	</Card>
+</CardGrid>
+
+<CardGrid>
+	<Card title="快速开始" icon="rocket">
+		了解 OriginLang 是什么，跟随[快速开始](getting-started/quickstart/)，理解[项目结构](getting-started/project-structure/)。
+	</Card>
+	<Card title="架构" icon="layers">
+		探索[分层架构](architecture/overview/)、[运行时内核](architecture/host-kernel/)与[传输矩阵](architecture/transports/)。
+	</Card>
+	<Card title="动手写代码" icon="add-document">
+		跟随指南[编写你的第一个插件](guides/write-a-plugin/)或[运行一个宿主](guides/run-a-host/)。
+	</Card>
+	<Card title="参考" icon="open-book">
+		查阅 [RPC 协议](reference/rpc-protocol/)、[错误码](reference/error-codes/)、[插件生命周期](reference/plugin-lifecycle/)与[插件清单](reference/manifest/)。
+	</Card>
+	<Card title="路线图" icon="milestone">
+		了解四大里程碑——从 M1 内核闭环到生产级生态。
+	</Card>
+</CardGrid>

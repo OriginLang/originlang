@@ -1,40 +1,72 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
-template: splash # Remove or comment out this line to display the site sidebar on this page.
+title: OriginLang
+description: A polyglot, plugin-based platform foundation for building extensible products.
+template: splash
 hero:
-  tagline: Congrats on setting up a new Starlight project!
-  image:
-    file: ../../assets/houston.webp
+  tagline: A polyglot, plugin-based platform foundation. Build extensible SaaS platforms, developer tools, AI workbenches, and more — with plugins written in your language of choice.
   actions:
-    - text: Example Guide
-      link: /guides/example/
+    - text: Get Started
+      link: /getting-started/introduction/
       icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
+    - text: View on GitHub
+      link: https://github.com/OriginLang/originlang
       icon: external
       variant: minimal
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-## Next steps
+## What is OriginLang?
+
+OriginLang is a **plugin-based, polyglot platform foundation** (底座). Any team building a product — a SaaS platform, developer tool, AI workbench, enterprise middle-platform, or desktop/mobile app — can build on OriginLang and get:
+
+- **Polyglot plugins**: write backend logic plugins in one of six first-class languages — Go, Rust, Java, Python, C++, or TypeScript — and UI extensions with TS/JS + your favorite frontend framework.
+- **Polyglot hosts**: embed the OriginLang kernel in any of the same six languages.
+- **Dynamic plugin-market-grade capabilities**: runtime hot-load, hot-upgrade, hot-unload, dependency resolution, fine-grained permissions, and plugin-market distribution.
+- **SaaS-native multi-tenancy**: tenant-scoped plugin visibility, quotas, metering, and failure isolation.
+- **Unified frontend/backend extension**: one plugin package declares both backend APIs and frontend components, menus, and routes — the host renders them with zero code injection.
+
+## Core Principles
 
 <CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
+	<Card title="Language-agnostic first" icon="puzzle">
+		SDKs ship in six languages with feature parity. No single-language lock-in.
 	</Card>
-	<Card title="Change page layout" icon="document">
-		Delete `template: splash` in `src/content/docs/index.mdx` to display a
-		sidebar on this page.
+	<Card title="Protocol / transport decoupling" icon="arrow-swap">
+		One JSON-RPC 2.0 protocol runs over stdio, TCP, HTTP, and future Wasm IPC transports.
 	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
+	<Card title="Unified lifecycle" icon="circle-check">
+		Wasm sandbox, child process, native dynamic library, and remote service — four plugin carriers with one lifecycle.
 	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
+	<Card title="Deny-by-default security" icon="shield">
+		Fine-grained capabilities, tenant grants, user policies, and resource quotas — three layers of authorization.
 	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
+	<Card title="Multi-tenant as a first-class citizen" icon="group">
+		Repository visibility, instance isolation, and quota metering are built in, not bolted on.
+	</Card>
+	<Card title="Zero-config observability" icon="pulse">
+		Plugin-level metrics, logs, and traces without writing instrumentation code.
+	</Card>
+</CardGrid>
+
+<CardGrid>
+	<Card title="Getting Started" icon="rocket">
+		Learn what OriginLang is, follow the [Quickstart](getting-started/quickstart/), and understand the
+		[project structure](getting-started/project-structure/).
+	</Card>
+	<Card title="Architecture" icon="layers">
+		Explore the [layered architecture](architecture/overview/), the
+		[Go host kernel](architecture/host-kernel/), and the [transport matrix](architecture/transports/).
+	</Card>
+	<Card title="Write Code" icon="add-document">
+		Follow the guide to [write your first plugin](guides/write-a-plugin/) or
+		[run a host](guides/run-a-host/).
+	</Card>
+	<Card title="Reference" icon="open-book">
+		Consult the [RPC protocol](reference/rpc-protocol/), [error codes](reference/error-codes/),
+		[plugin lifecycle](reference/plugin-lifecycle/), and [manifest](reference/manifest/) references.
+	</Card>
+	<Card title="Roadmap" icon="milestone">
+		See where OriginLang is headed across four milestones — from the M1 kernel loop to a production-grade ecosystem.
 	</Card>
 </CardGrid>

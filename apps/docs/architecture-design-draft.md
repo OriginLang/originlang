@@ -32,7 +32,7 @@
 
 | #  | 原则                                                         | 对应竞品问题的针对性                                                  |
 | :- | :--------------------------------------------------------- | :---------------------------------------------------------- |
-| P1 | **语言无关优先，宿主 SDK 与插件 PDK 六语言齐平发布**                          | Extism 长尾 SDK 冻结 / Tauri 必须写 Rust / Theia 仅 TS / PF4J 只 JVM |
+| P1 | **语言无关优先，SDK 六语言齐平发布**                                          | Extism 长尾 SDK 冻结 / Tauri 必须写 Rust / Theia 仅 TS / PF4J 只 JVM |
 | P2 | **协议与传输解耦：一种 JSON-RPC 协议跑在 stdio/TCP/HTTP/Wasm-IPC 四种传输上** | waPC 社区停滞 / 多数项目只有一种部署形态                                    |
 | P3 | **四种插件载体共存、统一生命周期**                                        | Extism/Wasm 不做原生高性能、PF4J 只 JVM、Tauri 编译期绑定                  |
 | P4 | **前后端扩展一体设计：一套 Manifest 同时声明后端能力 + UI 贡献点**                | 几乎所有竞品都分属两套体系                                               |
@@ -58,9 +58,8 @@
 │  L5 · 插件运行时层 (Plugin Runtime Layer)                                            │
 │  ① Wasm 沙箱运行时 (Wasmtime)  ② 子进程运行时  ③ 原生 .so/.dll  ④ 远程 HTTP/TCP    │
 ├─────────────────────────────────────────────────────────────────────────────────────┤
-│  L4 · 多语言 SDK / PDK 层 (Polyglot SDK Layer)                                      │
-│  Host SDK:     Go | Rust | Java | Python | C++ | TypeScript （6 种一等公民）        │
-│  Plugin PDK:   Go | Rust | Java | Python | C++ | TypeScript （6 种一等公民）        │
+│  L4 · 多语言 SDK 层 (Polyglot SDK Layer)                                            │
+│  SDK:          Go | Rust | Java | Python | C++ | TypeScript （6 种一等公民）        │
 ├─────────────────────────────────────────────────────────────────────────────────────┤
 │  L3 · 协议与传输层 (Protocol & Transport Layer)                                      │
 │  JSON-RPC 2.0 (已实现) · Manifest Schema (WIT/JSON) · Codec · stdio/TCP/HTTP/Wasm   │
@@ -89,7 +88,7 @@
 
 - **性能敏感子模块（Wasm 引擎桥接、资源配额 Enforcer）**：**Rust 实现**，通过 C ABI（FFI）供 Go 内核调用；
 
-- **宿主多语言适配**：Go/Rust 内核导出 C ABI → 各语言 Host SDK 做薄绑定（类似 Extism 的 `libextism` 策略，但我们的 `liboriginlang` 同时导出 Go 核心 + Rust 高性能模块）。
+- **宿主多语言适配**：Go/Rust 内核导出 C ABI → 各语言 SDK 做薄绑定（类似 Extism 的 `libextism` 策略，但我们的 `liboriginlang` 同时导出 Go 核心 + Rust 高性能模块）。
 
 ***
 
@@ -321,18 +320,18 @@ inproc (同语言)  →  native (有匹配平台 .so/.dll)  →  wasm (首选，
 
 ***
 
-### 3.4 L4 多语言 SDK / PDK 层（六大语言齐平）
+### 3.4 L4 多语言 SDK 层（六大语言齐平）
 
-这是 OriginLang 最核心的差异化（针对 Extism 长尾 SDK 冻结）。**发布策略：任何 Host SDK / Plugin PDK 的大版本必须 6 语言同时发布，否则不发版。**
+这是 OriginLang 最核心的差异化（针对 Extism 长尾 SDK 冻结）。**发布策略：任何 SDK 的大版本必须 6 语言同时发布，否则不发版。**
 
-\| 语言 | Host SDK 定位 | Plugin PDK 定位 | 底层依赖 |
-\| :-- | :-- | :-- |
-\| **Go** | 宿主内核参考实现 (本仓库) | `tinygo build -target wasip1` + Go 子进程 | 纯 stdlib 依赖（现有代码已经是零第三方依赖） |
-\| **Rust** | 性能敏感宿主；Wasm 桥接层 | `cargo build --target wasm32-wasip1` + 原生 cdylib | `tokio` (异步) + `wasmtime` (可选嵌入) |
-\| **Java** | 企业级宿主（Spring Boot 集成） | `GraalVM Native Image → wasm` + Java 子进程 JVM | `Foreign Function & Memory API` (Java 22+) 调用 `liboriginlang` |
-\| **Python** | AI / 数据科学宿主 | `Pyodide wasm` + Python 子进程 CPython | `cffi` 绑定 `liboriginlang` |
-\| **C++** | 高性能 / 嵌入式宿主 | 原生动态库直接 dlopen + Emscripten wasm | C ABI 头文件（`originlang.h`） |
-\| **TypeScript** | Web / Node.js 宿主 + 所有 UI 插件作者 | `JCO` (Component Model → JS) + Node 子进程 | `node:ffi-napi` 或纯 JS 重实现（像 Extism JS SDK 那样） |
+\| 语言 | SDK 定位 | 底层依赖 |
+\| :-- | :-- |
+\| **Go** | 宿主内核参考实现 (本仓库)；`tinygo build -target wasip1` + Go 子进程 | 纯 stdlib 依赖（现有代码已经是零第三方依赖） |
+\| **Rust** | 性能敏感宿主；Wasm 桥接层；`cargo build --target wasm32-wasip1` + 原生 cdylib | `tokio` (异步) + `wasmtime` (可选嵌入) |
+\| **Java** | 企业级宿主（Spring Boot 集成）；`GraalVM Native Image → wasm` + Java 子进程 JVM | `Foreign Function & Memory API` (Java 22+) 调用 `liboriginlang` |
+\| **Python** | AI / 数据科学宿主；`Pyodide wasm` + Python 子进程 CPython | `cffi` 绑定 `liboriginlang` |
+\| **C++** | 高性能 / 嵌入式宿主；原生动态库直接 dlopen + Emscripten wasm | C ABI 头文件（`originlang.h`） |
+\| **TypeScript** | Web / Node.js 宿主 + 所有 UI 插件作者；`JCO` (Component Model → JS) + Node 子进程 | `node:ffi-napi` 或纯 JS 重实现（像 Extism JS SDK 那样） |
 
 ***
 
@@ -395,13 +394,13 @@ dist/ui/
 
 OriginLang 本身**不做任何垂直业务功能**。这一层留给业务方，典型集成方式：
 
-- **企业中台团队**：基于 OriginLang Host SDK（Java/Spring Boot）搭中台，业务部门各自写 Go/Java/Python 插件 + UI 扩展；
+- **企业中台团队**：基于 OriginLang SDK（Java/Spring Boot）搭中台，业务部门各自写 Go/Java/Python 插件 + UI 扩展；
 
-- **AI 工作台产品**：基于 OriginLang Host SDK（Python + TS）搭平台，各模型供应商、各工具链都是 OriginLang 插件；
+- **AI 工作台产品**：基于 OriginLang SDK（Python + TS）搭平台，各模型供应商、各工具链都是 OriginLang 插件；
 
-- **开发者工具（IDE/Cloud IDE）**：基于 OriginLang Host SDK（Go/Rust + TS）搭核心，语言服务、调试器、Linter 都是插件；
+- **开发者工具（IDE/Cloud IDE）**：基于 OriginLang SDK（Go/Rust + TS）搭核心，语言服务、调试器、Linter 都是插件；
 
-- **跨平台桌面应用**：基于 OriginLang Host SDK（Rust）嵌入 Tauri，OriginLang 管"业务插件系统"，Tauri 管"窗口/系统 API"。
+- **跨平台桌面应用**：基于 OriginLang SDK（Rust）嵌入 Tauri，OriginLang 管"业务插件系统"，Tauri 管"窗口/系统 API"。
 
 ***
 
@@ -480,8 +479,7 @@ originlang/
 │   │   │   ├── eventbus/   (新增)                 → sync + async (NATS/Redis) 双后端
 │   │   │   ├── observ/     (新增)                 → OpenTelemetry 自动埋点
 │   │   │   └── pkg/        (新增)                 → OCI 包下载/签名校验/依赖解析
-│   │   └── sdk/                                  ← 【L4 · Go Host SDK】（包一层 kernel Facade + 类型安全）
-│   │   └── pdk/                                  ← 【L4 · Go Plugin PDK】（子进程插件骨架 + Wasm TinyGo 模板）
+│   │   └── sdk/                                  ← 【L4 · Go SDK】（包一层 kernel Facade + 类型安全 + 子进程插件骨架 + Wasm TinyGo 模板）
 │   │
 │   ├── rust/
 │   │   ├── core/         (新增)                   ← 【L2 · 高性能内核子模块 + liboriginlang.so C ABI】
@@ -489,13 +487,12 @@ originlang/
 │   │   │   ├── wasm_bridge/      → Wasmtime 嵌入 + WIT 绑定生成
 │   │   │   ├── c_abi/            → 导出 originlang_*() C 函数供 6 语言 SDK 绑定
 │   │   │   └── fuzz_tests/       → 安全模糊测试
-│   │   ├── sdk/          (新增)                   ← 【L4 · Rust Host SDK】
-│   │   └── pdk/          (新增)                   ← 【L4 · Rust Plugin PDK】
+│   │   └── sdk/          (新增)                   ← 【L4 · Rust SDK】
 │   │
-│   ├── java/core/      (新增)                     ← 【L4 · Java Host SDK + Plugin PDK】FFM 调用 liboriginlang
-│   ├── python/core/    (新增)                     ← 【L4 · Python Host SDK + Plugin PDK】cffi 调用 liboriginlang
-│   ├── cpp/core/       (新增)                     ← 【L4 · C++ Host SDK + Plugin PDK】头文件 + 链接 liboriginlang
-│   └── ts/core/        (新增)                     ← 【L4 · TS Host SDK + Plugin PDK + UI SDK（Web Components + MF）】
+│   ├── java/core/      (新增)                     ← 【L4 · Java SDK】FFM 调用 liboriginlang
+│   ├── python/core/    (新增)                     ← 【L4 · Python SDK】cffi 调用 liboriginlang
+│   ├── cpp/core/       (新增)                     ← 【L4 · C++ SDK】头文件 + 链接 liboriginlang
+│   └── ts/core/        (新增)                     ← 【L4 · TS SDK + UI SDK（Web Components + MF）】
 │
 ├── apps/
 │   ├── docs/                                  ← 架构文档（本文件）
@@ -526,10 +523,10 @@ originlang/
 
 | 里程碑                  | 时间       | 交付物                                                                                                                                                  | 完成标志                                                                                                |
 | :------------------- | :------- | :--------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------- |
-| **M1 · 内核闭环 (MVP)**  | 0\~3 个月  | Go 内核：完善 4 种传输 + 插件 4 载体加载器 + 扩展点注册表（前 6 个后端扩展点）+ Security Engine v1 + Resource Quota v1；`ol` CLI (init/build/test)；Go/TS Host SDK + Go/TS PDK       | 一个示例应用（TODO SaaS）：3 个插件（Go Wasm / TS stdio / Rust native），1 个菜单 UI 扩展，1 个 API 扩展，单机跑通全生命周期 + 权限拦截生效 |
-| **M2 · 六语言齐平 + 可观测** | 3\~6 个月  | Rust/Java/Python/C++ 四种 Host SDK + Plugin PDK 全部 v1.0；可观测性 (Prom/OTel)；`integration/` 跨语言矩阵测试；前端 UI SDK v1（菜单/路由/组件/设置面板 4 个 UI 扩展点）；热升级/回滚          | CI 中 6 语言 × 4 载体的 E2E 测试全绿；P95 延迟、错误率在 Grafana 大盘可见；10 插件同时升级无中断                                    |
+| **M1 · 内核闭环 (MVP)**  | 0\~3 个月  | Go 内核：完善 4 种传输 + 插件 4 载体加载器 + 扩展点注册表（前 6 个后端扩展点）+ Security Engine v1 + Resource Quota v1；`ol` CLI (init/build/test)；Go/TS SDK       | 一个示例应用（TODO SaaS）：3 个插件（Go Wasm / TS stdio / Rust native），1 个菜单 UI 扩展，1 个 API 扩展，单机跑通全生命周期 + 权限拦截生效 |
+| **M2 · 六语言齐平 + 可观测** | 3\~6 个月  | Rust/Java/Python/C++ 四种 SDK 全部 v1.0；可观测性 (Prom/OTel)；`integration/` 跨语言矩阵测试；前端 UI SDK v1（菜单/路由/组件/设置面板 4 个 UI 扩展点）；热升级/回滚          | CI 中 6 语言 × 4 载体的 E2E 测试全绿；P95 延迟、错误率在 Grafana 大盘可见；10 插件同时升级无中断                                    |
 | **M3 · 多租户 + 插件市场**  | 6\~9 个月  | OCI Registry + cosign 签名；插件市场 Web + 多租户控制台；依赖冲突 SAT 求解器；灰度升级/降级；事件总线分布式后端 (NATS)；远程 HTTP 插件 + K8s Operator v1                                        | 3 个租户同时使用，租户间数据/插件 100% 隔离；市场上已有 20+ 官方示例插件；插件包推送/安装/下架/回滚全流程可用                                     |
-| **M4 · 生产级 + 生态孵化**  | 9\~12 个月 | 熔断/限流/降级/故障注入完整；UI 扩展点完善至 10 个；Wasm Component Model WIT 自动绑定生成工具（对标 XTP Bindgen）；Tauri + OriginLang 集成模板；Theia + OriginLang 集成模板；性能白皮书（4 种载体延迟/吞吐基准） | 至少一个真实业务团队生产使用；社区贡献 ≥3 个第三方 Host SDK 或 PDK；GitHub Stars ≥1k（目标）                                     |
+| **M4 · 生产级 + 生态孵化**  | 9\~12 个月 | 熔断/限流/降级/故障注入完整；UI 扩展点完善至 10 个；Wasm Component Model WIT 自动绑定生成工具（对标 XTP Bindgen）；Tauri + OriginLang 集成模板；Theia + OriginLang 集成模板；性能白皮书（4 种载体延迟/吞吐基准） | 至少一个真实业务团队生产使用；社区贡献 ≥3 个第三方 SDK；GitHub Stars ≥1k（目标）                                     |
 
 ***
 
@@ -555,7 +552,7 @@ originlang/
 
 | #  | 风险/问题                                             | 建议                                                                                                                                    |
 | :- | :------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------ |
-| R1 | 六语言 SDK/PDK 齐平发布的**维护成本巨大**（6×2=12 套 SDK 要同步 API） | ① **定义** **`liboriginlang`** **C ABI 为唯一真源**，SDK 都是薄绑定（除 Go 内核本身和 TS 纯 JS 实现）；② 写一套契约测试 (Contract Test)，所有 SDK 必须通过相同的 golden JSON 用例 |
+| R1 | 六语言 SDK 齐平发布的**维护成本巨大**（6 套 SDK 要同步 API） | ① **定义** **`liboriginlang`** **C ABI 为唯一真源**，SDK 都是薄绑定（除 Go 内核本身和 TS 纯 JS 实现）；② 写一套契约测试 (Contract Test)，所有 SDK 必须通过相同的 golden JSON 用例 |
 | R2 | Wasm GC 语言（Python/Java）的包体积大、性能弱，用户体验不好           | ① M1/M2 文档明确标注"生产级插件推荐 Go/Rust/C++ Wasm，Py/Java 适合原型 + 子进程模式"；② M3 研究 GC-heapless Java (Chicory) 路径                                   |
 | R3 | 原生动态库 (native) 模式的安全风险（段错误拉垮宿主）                   | ① 默认**禁用 native 模式**，需显式配置 `enable_native_artifacts: true` + 插件必须平台管理员白名单；② 文档中明确推荐顺序 wasm > stdio > remote > native                  |
 | R4 | Web Components 与现有业务团队（React/Vue）的使用体验            | ① 提供 React/Vue 适配器 (`@originlang/react-adapter` 把 `<acme-xxx>` 包成 React 组件)；② Module Federation 模式直接允许 React/Vue 原样导出业务模块             |

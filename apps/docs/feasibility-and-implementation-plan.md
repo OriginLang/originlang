@@ -84,18 +84,12 @@ tools/BUILD      tests/BUILD      third_party/BUILD
 | **L2 内核**    | Resource Quota (Rust FFI)   | ⚠️ 中等偏难 | 无                             | 24h  | Rust 令牌桶 + C ABI + Go FFI 绑定        |
 | **L2 内核**    | Observability Collector     | ✅ 低难度   | 无                             | 12h  | Go 原生 prometheus + otel SDK         |
 | **L2 内核**    | Kernel Facade (集成层)         | ✅ 低难度   | manager.go 是事实 Facade 雏形      | 8h   | 聚合上述子系统                             |
-| **L4 SDK**   | Go Host SDK                 | ✅ 已完成   | sdk/ + manager/ = 宿主+插件双侧     | 2h   | 封装 Facade 即可                        |
-| **L4 SDK**   | Go Plugin PDK               | ✅ 已完成   | sdk/ Serve()                  | 0    | 无                                   |
-| **L4 SDK**   | Rust Host SDK               | ⚠️ 中等偏难 | 无 (src/rust/core/.gitkeep)    | 40h  | 需 Rust→C ABI→Go 内核或 Rust 独立实现       |
-| **L4 SDK**   | Rust Plugin PDK             | ⚠️ 中等   | 无                             | 24h  | 仿 Go sdk.Serve() 结构                 |
-| **L4 SDK**   | Java Host SDK               | ⚠️ 中等偏难 | 无 (src/java/core/.gitkeep)    | 32h  | Java 22 FFM 调用 liboriginlang        |
-| **L4 SDK**   | Java Plugin PDK             | ⚠️ 中等   | 无                             | 16h  | stdio JSON-RPC + 子进程                |
-| **L4 SDK**   | Python Host SDK             | ⚠️ 中等偏难 | 无 (src/python/core/.gitkeep)  | 24h  | cffi 绑定                             |
-| **L4 SDK**   | Python Plugin PDK           | ⚠️ 中等   | 无                             | 12h  | stdio JSON-RPC + 子进程                |
-| **L4 SDK**   | C++ Host SDK                | ⚠️ 中等   | 无 (src/cpp/core/.gitkeep)     | 24h  | 头文件 + 链接 liboriginlang              |
-| **L4 SDK**   | C++ Plugin PDK              | ⚠️ 中等   | 无                             | 16h  | stdio JSON-RPC                      |
-| **L4 SDK**   | TS Host SDK                 | ⚠️ 中等   | 无 (src/ts/core/.gitkeep)      | 20h  | 纯 JS 重实现或 node:ffi                  |
-| **L4 SDK**   | TS Plugin PDK               | ⚠️ 中等   | 无                             | 12h  | stdio JSON-RPC + Node 子进程           |
+| **L4 SDK**   | Go SDK                     | ✅ 已完成   | sdk/ + manager/ + Serve() = 宿主+插件双侧 | 2h   | 封装 Facade 即可                        |
+| **L4 SDK**   | Rust SDK                   | ⚠️ 中等偏难 | 无 (src/rust/core/.gitkeep)    | 64h  | Rust→C ABI→Go 内核或独立实现；插件侧仿 Go sdk.Serve() |
+| **L4 SDK**   | Java SDK                   | ⚠️ 中等偏难 | 无 (src/java/core/.gitkeep)    | 48h  | Java 22 FFM 调用 liboriginlang；插件侧走 stdio JSON-RPC + 子进程 |
+| **L4 SDK**   | Python SDK                 | ⚠️ 中等偏难 | 无 (src/python/core/.gitkeep)  | 36h  | cffi 绑定；插件侧走 stdio JSON-RPC + 子进程 |
+| **L4 SDK**   | C++ SDK                    | ⚠️ 中等   | 无 (src/cpp/core/.gitkeep)     | 40h  | 头文件 + 链接 liboriginlang；插件侧走 stdio JSON-RPC |
+| **L4 SDK**   | TS SDK                     | ⚠️ 中等   | 无 (src/ts/core/.gitkeep)      | 32h  | 纯 JS 重实现或 node:ffi；插件侧走 stdio JSON-RPC + Node 子进程 |
 | **L5 运行时**   | Wasm 沙箱加载器                  | ⚠️ 中等偏难 | 无                             | 32h  | Wasmtime 嵌入 + WIT 解析 + Component 加载 |
 | **L5 运行时**   | 子进程加载器                      | ✅ 已完成   | manager.Load()                | 0    | 无                                   |
 | **L5 运行时**   | 原生动态库加载器                    | ⚠️ 中等   | 无                             | 16h  | dlopen + C ABI 符号解析                 |
@@ -128,7 +122,7 @@ tools/BUILD      tests/BUILD      third_party/BUILD
 | #  | 风险                           | 影响                       | 缓解                                          |
 | :- | :--------------------------- | :----------------------- | :------------------------------------------ |
 | K1 | **Wasmtime 嵌入 Go 的 FFI 复杂度** | L5 Wasm 加载器是核心差异化能力      | 先用 `wasmtime-go` 绑定包做 MVP，不自己写 FFI          |
-| K2 | **六语言 SDK 同步发布的维护成本**        | 12 套 SDK 需要 API 一致性      | 定义 C ABI 为唯一真源；SDK 都是薄绑定；Contract Test 自动验证 |
+| K2 | **六语言 SDK 同步发布的维护成本**        | 6 套 SDK 需要 API 一致性      | 定义 C ABI 为唯一真源；SDK 都是薄绑定；Contract Test 自动验证 |
 | K3 | **UI 扩展层跨框架兼容性**             | React/Vue/Angular 生态差异   | Web Components 标准为载体，MF 为懒加载补充              |
 | K4 | **原生动态库 (dlopen) 的安全风险**     | 段错误拉垮宿主进程                | 默认禁用，需管理员白名单；文档明确推荐顺序                       |
 | K5 | **SAT 依赖求解器复杂度**             | M3 才需要，但设计影响 Manifest 格式 | M1 先用拓扑排序 + semver 简单匹配，M3 再升级 SAT          |
@@ -139,7 +133,7 @@ tools/BUILD      tests/BUILD      third_party/BUILD
 
 ### 3.1 M1 · 内核闭环 (0\~3 个月)
 
-**目标**：基于现有代码，扩展到 4 种传输 + Manifest 解析 + 扩展点注册表 + Security Engine v1 + `ol` CLI + Go/TS SDK/PDK，跑通一个示例应用。
+**目标**：基于现有代码，扩展到 4 种传输 + Manifest 解析 + 扩展点注册表 + Security Engine v1 + `ol` CLI + Go/TS SDK，跑通一个示例应用。
 
 #### Sprint 1.1 — 协议扩展 + Manifest（第 1-2 周）
 
@@ -192,12 +186,12 @@ tools/BUILD      tests/BUILD      third_party/BUILD
 | T1.5.5 | `ol run`：启动一个最小宿主进程，加载指定插件包，暴露 JSON-RPC 端口供调试                                                   | T1.5.1            | run.go          | 6h  | P1  |
 | T1.5.6 | 示例应用 TODO-SaaS：`apps/todo-saas/`，一个 Go 宿主 + 3 个插件（Go stdio + TS stdio + Go inproc）+ 1 个菜单 UI 扩展 | T1.5.2\~T1.5.5 全部 | apps/todo-saas/ | 16h | P0  |
 
-#### Sprint 1.6 — TS SDK/PDK + 端到端测试（第 11-12 周）
+#### Sprint 1.6 — TS SDK + 端到端测试（第 11-12 周）
 
 | 任务 ID  | 任务                                                                                                                                  | 依赖            | 产出           | 预估  | 优先级 |
 | :----- | :---------------------------------------------------------------------------------------------------------------------------------- | :------------ | :----------- | :-- | :-- |
-| T1.6.1 | TS Host SDK：`src/ts/core/host/`，JSON-RPC 2.0 编解码 + Transport 抽象 (stdio via child\_process + TCP via net + HTTP via fetch) + Manager | 无             | ts/host/     | 12h | P0  |
-| T1.6.2 | TS Plugin PDK：`src/ts/core/pdk/`，Serve() 函数 (stdio JSON-RPC + register/ping/shutdown 处理)                                            | 无             | ts/pdk/      | 6h  | P0  |
+| T1.6.1 | TS SDK（宿主侧）：`src/ts/core/sdk/host/`，JSON-RPC 2.0 编解码 + Transport 抽象 (stdio via child\_process + TCP via net + HTTP via fetch) + Manager | 无             | ts/sdk/host/ | 12h | P0  |
+| T1.6.2 | TS SDK（插件侧）：`src/ts/core/sdk/plugin/`，Serve() 函数 (stdio JSON-RPC + register/ping/shutdown 处理)                                            | 无             | ts/sdk/plugin/ | 6h  | P0  |
 | T1.6.3 | TS 插件示例：`apps/todo-saas/plugins/ts-plugin/`，一个 TypeScript stdio 插件                                                                  | T1.6.2        | ts plugin    | 4h  | P0  |
 | T1.6.4 | 端到端测试：Go 宿主加载 Go 插件 (stdio) + TS 插件 (stdio) + Go 插件 (inproc)，验证调用 + Manifest 解析 + 扩展点注册 + 健康检查                                      | T1.5.6 T1.6.3 | e2e\_test.go | 8h  | P0  |
 | T1.6.5 | Bazel TS 规则启用：取消注释 MODULE.bazel 中的 aspect\_rules\_js/rules\_ts                                                                      | 无             | MODULE.bazel | 1h  | P1  |
@@ -209,9 +203,9 @@ tools/BUILD      tests/BUILD      third_party/BUILD
 
 - `ol` CLI v1 (init/build/test/run)
 
-- Go Host SDK + Go Plugin PDK（现有已基本完成）
+- Go SDK（宿主 + 插件双侧，现有已基本完成）
 
-- TS Host SDK + TS Plugin PDK
+- TS SDK（宿主 + 插件双侧）
 
 - 示例应用 TODO-SaaS（3 插件 + 1 UI 扩展）
 
@@ -223,29 +217,29 @@ tools/BUILD      tests/BUILD      third_party/BUILD
 
 ### 3.2 M2 · 六语言齐平 + 可观测性（3\~6 个月）
 
-**目标**：Rust/Java/Python/C++ 四种 Host SDK + Plugin PDK 全部 v1.0；可观测性（Prometheus + OpenTelemetry）；UI 扩展 SDK v1；热升级/回滚。
+**目标**：Rust/Java/Python/C++ 四种 SDK 全部 v1.0；可观测性（Prometheus + OpenTelemetry）；UI 扩展 SDK v1；热升级/回滚。
 
-#### Sprint 2.1 — Rust SDK/PDK + Rust FFI 层（第 1-4 周）
+#### Sprint 2.1 — Rust SDK + Rust FFI 层（第 1-4 周）
 
 | 任务 ID  | 任务                                                                                                                                 | 依赖     | 产出                   | 预估  | 优先级 |
 | :----- | :--------------------------------------------------------------------------------------------------------------------------------- | :----- | :------------------- | :-- | :-- |
 | T2.1.1 | Rust C ABI 层：`src/rust/core/c_abi/`，定义 `originlang_*` C 函数（init/call/shutdown/register\_handler），导出 `liboriginlang.so/.dll/.dylib` | 无      | c\_abi/              | 16h | P0  |
-| T2.1.2 | Rust Host SDK：`src/rust/core/sdk/`，封装 C ABI 调用 + Rust idiomatic API                                                                | T2.1.1 | sdk/                 | 12h | P0  |
-| T2.1.3 | Rust Plugin PDK：`src/rust/core/pdk/`，stdio JSON-RPC + register/ping/shutdown（仿 Go sdk.Serve 结构）                                    | 无      | pdk/                 | 8h  | P0  |
+| T2.1.2 | Rust SDK（宿主侧）：`src/rust/core/sdk/`，封装 C ABI 调用 + Rust idiomatic API                                                                | T2.1.1 | sdk/                 | 12h | P0  |
+| T2.1.3 | Rust SDK（插件侧）：`src/rust/core/sdk/`，stdio JSON-RPC + register/ping/shutdown（仿 Go sdk.Serve 结构）                                      | 无      | sdk/                 | 8h  | P0  |
 | T2.1.4 | Rust 插件示例：`apps/todo-saas/plugins/rust-plugin/`，一个 Rust stdio 插件                                                                   | T2.1.3 | rust plugin          | 4h  | P0  |
 | T2.1.5 | Rust Contract Test 适配：Rust SDK 跑通 `tests/contract/` golden 用例                                                                      | T2.1.2 | rust\_contract\_test | 4h  | P0  |
 | T2.1.6 | Rust Bazel 构建：`src/rust/core/BUILD.bazel`，rules\_rust 配置 cdylib + test                                                             | 无      | BUILD.bazel          | 4h  | P0  |
 
-#### Sprint 2.2 — Java/Python/C++ SDK/PDK（第 5-10 周，三语言并行）
+#### Sprint 2.2 — Java/Python/C++ SDK（第 5-10 周，三语言并行）
 
 | 任务 ID  | 任务                                                                                                | 依赖                   | 产出             | 预估  | 优先级 |
 | :----- | :------------------------------------------------------------------------------------------------ | :------------------- | :------------- | :-- | :-- |
-| T2.2.1 | Java Host SDK：`src/java/core/sdk/`，Java 22 FFM (Foreign Function & Memory API) 调用 `liboriginlang` | T2.1.1               | sdk/           | 12h | P0  |
-| T2.2.2 | Java Plugin PDK：`src/java/core/pdk/`，stdio JSON-RPC + 子进程 JVM                                     | 无                    | pdk/           | 8h  | P0  |
-| T2.2.3 | Python Host SDK：`src/python/core/sdk/`，cffi 绑定 `liboriginlang`                                    | T2.1.1               | sdk/           | 10h | P0  |
-| T2.2.4 | Python Plugin PDK：`src/python/core/pdk/`，stdio JSON-RPC + 子进程 CPython                             | 无                    | pdk/           | 6h  | P0  |
-| T2.2.5 | C++ Host SDK：`src/cpp/core/sdk/`，头文件 `originlang.h` + 链接 `liboriginlang`                          | T2.1.1               | sdk/ + .h      | 10h | P0  |
-| T2.2.6 | C++ Plugin PDK：`src/cpp/core/pdk/`，stdio JSON-RPC + header-only                                   | 无                    | pdk/           | 8h  | P0  |
+| T2.2.1 | Java SDK（宿主侧）：`src/java/core/sdk/`，Java 22 FFM (Foreign Function & Memory API) 调用 `liboriginlang` | T2.1.1               | sdk/           | 12h | P0  |
+| T2.2.2 | Java SDK（插件侧）：`src/java/core/sdk/`，stdio JSON-RPC + 子进程 JVM                                     | 无                    | sdk/           | 8h  | P0  |
+| T2.2.3 | Python SDK（宿主侧）：`src/python/core/sdk/`，cffi 绑定 `liboriginlang`                                    | T2.1.1               | sdk/           | 10h | P0  |
+| T2.2.4 | Python SDK（插件侧）：`src/python/core/sdk/`，stdio JSON-RPC + 子进程 CPython                             | 无                    | sdk/           | 6h  | P0  |
+| T2.2.5 | C++ SDK（宿主侧）：`src/cpp/core/sdk/`，头文件 `originlang.h` + 链接 `liboriginlang`                          | T2.1.1               | sdk/ + .h      | 10h | P0  |
+| T2.2.6 | C++ SDK（插件侧）：`src/cpp/core/sdk/`，stdio JSON-RPC + header-only                                   | 无                    | sdk/           | 8h  | P0  |
 | T2.2.7 | 三语言插件示例：Java/Python/C++ 各一个 stdio 插件接入 TODO-SaaS                                                  | T2.2.2 T2.2.4 T2.2.6 | 3 plugins      | 6h  | P0  |
 | T2.2.8 | 三语言 Contract Test 适配                                                                              | T2.2.1 T2.2.3 T2.2.5 | contract tests | 6h  | P0  |
 | T2.2.9 | 三语言 Bazel 构建：rules\_java/rules\_python/rules\_cc 配置                                               | 无                    | 3×BUILD.bazel  | 6h  | P1  |
@@ -320,8 +314,8 @@ tools/BUILD      tests/BUILD      third_party/BUILD
 | T4.2  | 故障注入：`src/go/host/chaos/`，测试模式下的延迟/错误/崩溃注入                                                     | 无         | chaos/          | 8h  | P1  |
 | T4.3  | Wasm 沙箱加载器：`src/go/host/loader/wasm.go`，嵌入 Wasmtime + WIT 解析 + Component 加载（先用 wasmtime-go 绑定） | 无         | wasm.go         | 24h | P0  |
 | T4.4  | Native 动态库加载器：`src/go/host/loader/native.go`，dlopen + C ABI 符号解析（纯 Go 用 `plugin` 标准库，跨语言用 CGO） | 无         | native.go       | 12h | P1  |
-| T4.5  | WIT 绑定生成工具：`tools/wit-bindgen/`，从 WIT 接口定义自动生成 6 语言的 Plugin PDK 骨架                             | 无         | wit-bindgen/    | 24h | P1  |
-| T4.6  | Tauri 集成模板：`apps/templates/tauri-originlang/`，Tauri 桌面应用嵌入 OriginLang Host SDK                 | T2.1.2    | tauri-template/ | 12h | P2  |
+| T4.5  | WIT 绑定生成工具：`tools/wit-bindgen/`，从 WIT 接口定义自动生成 6 语言的插件侧 SDK 骨架                             | 无         | wit-bindgen/    | 24h | P1  |
+| T4.6  | Tauri 集成模板：`apps/templates/tauri-originlang/`，Tauri 桌面应用嵌入 OriginLang SDK                 | T2.1.2    | tauri-template/ | 12h | P2  |
 | T4.7  | Theia 集成模板：`apps/templates/theia-originlang/`，Theia IDE 扩展调用 OriginLang 插件系统                   | 无         | theia-template/ | 16h | P2  |
 | T4.8  | 性能基准白皮书：`apps/docs/performance-benchmark.md`，4 种载体的延迟/吞吐量/内存基准                                 | T4.3 T4.4 | benchmark       | 8h  | P2  |
 | T4.9  | Vue 适配器：`src/ts/core/ui/vue-adapter.ts`                                                        | T2.4.3    | vue-adapter.ts  | 4h  | P2  |
@@ -357,8 +351,8 @@ T1.5.1 (CLI 骨架)
   ├── T1.5.4 (ol test)
   └── T1.5.5 (ol run) ──────────────┐
                                       └── T1.5.6 (TODO-SaaS)
-T1.6.1 (TS Host SDK)
-T1.6.2 (TS Plugin PDK)
+T1.6.1 (TS SDK · 宿主侧)
+T1.6.2 (TS SDK · 插件侧)
 T1.6.3 (TS 插件示例) ────────────────┐
 T1.6.4 (E2E 测试)                    └── M1 完成
 T1.6.5 (Bazel TS)  [并行]
@@ -397,8 +391,8 @@ T1.6.6 (Contract Test) [并行]
 | 6  | T1.4.1 Security Engine v1      | security/engine.go | 8h   | [manager.go](file:///e:/code/originlang/src/go/host/manager/manager.go)           |
 | 7  | T1.4.4 健康检查                    | health/checker.go  | 4h   | [plugin.go](file:///e:/code/originlang/src/go/host/plugin/plugin.go) 的 MethodPing |
 | 8  | T1.5.1 CLI 骨架                  | tools/cli/main.go  | 2h   | 新建                                                                                |
-| 9  | T1.6.1 TS Host SDK             | src/ts/core/host/  | 12h  | 新建                                                                                |
-| 10 | T1.6.2 TS Plugin PDK           | src/ts/core/pdk/   | 6h   | 新建                                                                                |
+| 9  | T1.6.1 TS SDK（宿主侧）         | src/ts/core/sdk/host/   | 12h  | 新建                                                                                |
+| 10 | T1.6.2 TS SDK（插件侧）         | src/ts/core/sdk/plugin/ | 6h   | 新建                                                                                |
 
 > 这 10 个任务总计 \~47h，可在 1 周内由 1-2 人完成，作为 M1 Sprint 1 的启动批次。
 
@@ -420,5 +414,5 @@ T1.6.6 (Contract Test) [并行]
 
 ***
 
-> **下一步行动**：建议从 §6 的 Top 10 任务开始，先完成 T1.1.1（0.5h，零风险改常量）和 T1.1.2（6h，新建 manifest 包），作为 Sprint 1.1 的第一周任务。同步启动 T1.6.1/T1.6.2 的 TS SDK/PDK（与 Go 内核改造无依赖，可并行）。
+> **下一步行动**：建议从 §6 的 Top 10 任务开始，先完成 T1.1.1（0.5h，零风险改常量）和 T1.1.2（6h，新建 manifest 包），作为 Sprint 1.1 的第一周任务。同步启动 T1.6.1/T1.6.2 的 TS SDK（与 Go 内核改造无依赖，可并行）。
 
