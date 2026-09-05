@@ -5,6 +5,20 @@ description: OriginLang 的总体分层架构。
 
 OriginLang 自底向上分为八层，从基础设施直到应用集成层。
 
+## 设计原则
+
+八层架构由七条设计原则驱动，每条都直接回应了现有同类平台（Extism、wasmCloud、Tauri、Theia、PF4J、TEN）的不足：
+
+| # | 原则 | 针对的问题 |
+| --- | --- | --- |
+| P1 | **语言无关优先，SDK 六语言齐平发布** | Extism 长尾 SDK 冻结 / Tauri 必须写 Rust / Theia 仅 TS / PF4J 只 JVM |
+| P2 | **协议与传输解耦：一种 JSON-RPC 2.0 协议跑在 stdio/TCP/HTTP/Wasm IPC 四种传输上** | waPC 社区停滞 / 多数项目只有一种部署形态 |
+| P3 | **四种插件载体共存、统一生命周期** | Extism/Wasm 不做原生高性能 / PF4J 只 JVM / Tauri 编译期绑定 |
+| P4 | **前后端扩展一体：一套 Manifest 同时声明后端能力 + UI 贡献点** | 几乎所有竞品都分属两套体系 |
+| P5 | **Deny-by-Default 安全 + 细粒度能力 + 租户级二次授权** | Tauri 插件同进程无隔离 / Extism 无租户概念 |
+| P6 | **多租户一等公民：插件仓库可见性、实例隔离、配额计量** | 所有竞品都无内建多租户 |
+| P7 | **可观测性一体化：插件级指标/日志/追踪零配置接入** | Wasm 类项目调试难 / Theia 慢扩展难定位 |
+
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────────┐
 │  L8 · 应用集成层                                                                    │
@@ -39,7 +53,26 @@ OriginLang 自底向上分为八层，从基础设施直到应用集成层。
 - **性能敏感子模块**：如 Wasm 桥接或资源配额执行器，应归属 `engine/` 或 `runtime/services`；有充分理由时可使用 Rust 与 FFI 边界。
 - **多语言宿主适配**：归属 `sdk/` 与 `adapters/`。SDK 消费稳定运行时契约，而不反向依赖产品应用或插件。
 
+参考实现约定（来自当前 Go 内核）：
+
+- Go 核心保持**零第三方依赖**（仅标准库）。
+- `json.RawMessage` 原样透传，不做有损重编码——这对跨语言互操作至关重要。
+- **单一对称 `Transport` 接口**同时被宿主和插件两端实现，远程/本地插件统一处理。
+- 管理器提供双入口：`Load`（子进程 stdio）与 `Attach`（远程 TCP）。
+- 插件 SDK 的 `Serve()` 一行即可引导出一个合规插件（register/ping/shutdown 处理器）。
+
 ## 各层要点
+
+### L1 · 基础设施层
+
+| 模块 | 选型 | 职责 |
+| --- | --- | --- |
+| 构建系统 | Bazel 9（`MODULE.bazel`） | 六语言统一构建、跨平台产物、缓存、Hermetic 测试 |
+| Wasm 引擎 | Wasmtime 43+ + Component Model + WIT | Wasm 沙箱插件运行时（对标 Extism/wasmCloud） |
+| 容器编排 | Kubernetes + OriginLang Operator | 分布式部署下的插件调度、伸缩、滚动升级 |
+| 插件分发 | OCI Registry（ORAS） | 插件包以 OCI Artifact 分发；Sigstore/cosign 签名 |
+| 元数据存储 | PostgreSQL | 插件元数据、版本、租户授权、配额、审计日志 |
+| 缓存 / 事件 | Redis + 可选 NATS | 事件总线后端、插件实例池缓存、分布式锁 |
 
 ### L2 · 内核（六大子系统）
 
@@ -60,6 +93,27 @@ OriginLang 自底向上分为八层，从基础设施直到应用集成层。
 
 插件作者可以给任意后端插件附带一个前端 UI 扩展包。UI 扩展以 **Web Components（Custom Elements v1 + Shadow DOM）** 交付——这是跨框架标准载体——辅以 **Module Federation** 懒加载重型业务模块。宿主应用框架无关（React、Vue、Angular、Svelte 均可）。
 
+### L7 · 平台治理层
+
+| 子模块 | 功能 |
+| --- | --- |
+| **OCI 注册中心** | 插件包以 OCI Artifact 分发（`oras push/pull`）；cosign 签名；semver tag + 通道（`stable` / `beta` / `nightly`） |
+| **插件市场 Web** | 浏览/搜索/评级/评论/使用统计；商业插件可对接支付；安全扫描报告（Wasm 安全审计 + SBOM） |
+| **版本与升级** | 依赖冲突自动解析（SAT 求解器）；按租户灰度升级（1% → 10% → 50% → 100%）；一键回滚 |
+| **多租户控制台** | 租户管理员：授权/禁用插件、配置配额、查看账单与使用报表；平台管理员：全局下架/熔断 |
+| **运营分析** | 插件安装量/活跃租户/DAU/错误率/P95 大盘；异常插件自动告警给作者 |
+
+**插件安装流程**。管理员授权后，治理层从 OCI 注册中心拉取插件包、验证签名 + SBOM、解包解析 Manifest 并校验依赖版本兼容、写入版本 + 租户授权记录、分配资源配额模板，然后通知内核——后者在首次调用时才惰性加载插件。
+
+### L8 · 应用集成层
+
+OriginLang 本身不做任何垂直业务功能，本层留给业务方：
+
+- **企业中台团队**：基于 SDK（Java/Spring Boot）搭中台，业务部门各自写 Go/Java/Python 插件 + UI 扩展；
+- **AI 工作台产品**：基于 SDK（Python + TS）搭平台，模型供应商与工具链都是 OriginLang 插件；
+- **开发者工具（IDE/Cloud IDE）**：基于 SDK（Go/Rust + TS）搭核心，语言服务、调试器、Linter 都是插件；
+- **跨平台桌面应用**：基于 SDK（Rust）嵌入 Tauri——OriginLang 管插件系统，Tauri 管窗口/系统 API。
+
 ## 与现有仓库的映射
 
 | 层 | 位置 |
@@ -68,7 +122,9 @@ OriginLang 自底向上分为八层，从基础设施直到应用集成层。
 | L3 协议与传输 | `runtime/ipc` |
 | L4 多语言 SDK | `sdk/` 各语言 SDK |
 | L4 执行引擎 | `engine/`、`adapters/`（Node.js、Python、WASM） |
+| 客户端入口 | `gateway/`（contracts、middleware、routing、transports） |
 | L7 治理 | `services/` 与 `apps/` 中的产品应用 |
 | L1 构建 | 根 `MODULE.bazel`、各目录 `BUILD` 文件 |
+| 开发者工具包 | `developer-kit/` 发行边界；CLI 工作流在 `cli/` |
 
 仓库级职责边界见[项目结构](../getting-started/project-structure/)。

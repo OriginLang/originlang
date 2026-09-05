@@ -46,6 +46,24 @@ OriginLang 是一个**支持多语言、插件化的通用平台底座**。它�
 - 不发明新的编程语言。
 - 不重复造成熟基础轮子：传输用 JSON-RPC 2.0、Wasm 用 Wasmtime、编排用 K8s Operator、构建用 Bazel。
 
+## 与同类项目的对比
+
+现有插件平台各留短板——SDK 长尾冻结、载体单一、无多租户。OriginLang 正是对这些不足的直接回应：
+
+| 维度 | Extism | wasmCloud | Tauri v2 | Eclipse Theia | PF4J | TEN | OriginLang |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 插件可选语言 | 10+（长尾冻结） | 5（Java 早期） | 仅 Rust | 仅 TS/JS | 仅 JVM | C++/Go/Python | 6 语言齐平发布（Go/Rust/Java/Python/C++/TS） |
+| 宿主可选语言 | 16+（长尾冻结） | 主要是 Rust/Go CLI | 仅 Rust | 仅 Node | 仅 Java | 主要是 C++/Go | 6 语言齐平 |
+| 前端 UI 扩展 | 无 | 无 | 有（但必须 Rust 后端） | 有（仅 TS/IDE 场景） | 无 | 无 | Web Components + MF 跨框架一体化 |
+| 四种插件载体并存 | 仅 Wasm | 仅 Wasm 组件 | 编译期绑定 Rust crate | npm 包（编译期） | 仅 jar（JVM） | 原生模块 | Wasm/子进程/原生库/远程四种统一生命周期 |
+| 运行时热加载 | 有 | 有 | 无（编译期绑定） | 部分（dev 模式） | 有 | 有 | 有，且四种载体都支持 |
+| 细粒度 Capability 权限 | 仅 Wasm 级 | WASI deny-by-default | 仅命令级 | 仅 workspace 级 | 无内建 | 简单 | 三层：Manifest + 租户授权 + 用户 RBAC + 配额 |
+| 一等公民多租户 | 无 | 无 | 无 | 无 | 无 | 无 | 内建：可见性/配额/计费/实例隔离 |
+| 插件级可观测性 | 无 | 基础 tracing | 无 | 较少 | 无 | 实时场景强 | 零配置指标/日志/追踪/慢插件剖析 |
+| 插件依赖版本管理 | 需自建 | 组件组合，无 SAT | 由 Cargo 解决 | npm 依赖地狱 | 简单 + Maven 冲突 | 无 | SAT 求解器 + semver + 灰度 + 回滚 |
+| 部署形态 | Server/Edge/CLI/IoT | Cloud/Edge K8s | 桌面/移动 App | Browser/Electron | JVM Server | Server/SDK | 全部覆盖：单机/K8s/桌面(Tauri)/移动/边缘/IDE(Theia) |
+| 定位 | 通用 Wasm 插件系统 | K8s 级 Wasm 微服务平台 | 跨平台应用框架 | IDE/开发工具平台 | Java 服务端模块化 | 实时 AI Agent 框架 | 通用多语言插件化平台底座（所有场景） |
+
 ## 当前状态
 
-仓库当前提供运行时（`core`、`services`、`ipc`、`host-api`）、执行引擎、适配器、SDK、CLI、模块、插件和示例的目录骨架。这些边界用于指导后续实现；具体语言 SDK 与可部署宿主会随其公开契约一起落地。请先阅读[项目结构](project-structure/)。
+仓库当前提供运行时（`core`、`services`、`ipc`、`host-api`）、执行引擎、适配器、SDK、CLI、模块、插件、示例、[网关](../architecture/gateway/)与[开发者工具包](../reference/developer-kit/)的目录骨架。这些边界用于指导后续实现；具体语言 SDK 与可部署宿主会随其公开契约一起落地。请先阅读[项目结构](project-structure/)。

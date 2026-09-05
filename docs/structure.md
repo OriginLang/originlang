@@ -13,9 +13,11 @@ originlang/
 ├── adapters/             # Node.js、Python、WASM 等适配层
 ├── sdk/                  # 各语言 SDK
 ├── cli/                  # 命令行工具
+├── developer-kit/        # 面向插件开发者的发行边界
 ├── modules/              # 可独立版本化的官方模块
 ├── plugins/              # 官方插件
 ├── examples/             # 示例
+├── gateway/              # App/CLI/桌面/远程客户端的统一入口层
 ├── apps/                 # 产品或可执行应用入口
 ├── services/             # 可部署的外部服务
 ├── tests/                # 单元与集成测试
@@ -33,16 +35,18 @@ originlang/
 | `adapters/` | Node.js、Python、WASM 等外部运行时适配。 | 重复的核心协议定义。 |
 | `sdk/` | 面向各语言的宿主和插件开发接口。 | 运行时核心实现。 |
 | `cli/` | 初始化、构建、运行、测试与发布等命令行工作流。 | 运行时内部业务规则。 |
+| `developer-kit/` | 插件开发者发行边界：CLI、SDK、模板与本地开发宿主。 | 运行时核心实现。 |
 | `modules/` | 可独立发布和版本化的官方复用模块。 | 运行时底座。 |
 | `plugins/` | 官方维护的插件实现。 | 通用基础设施。 |
 | `examples/` | 聚焦场景的可运行最小示例。 | 正式发布模块的唯一实现。 |
+| `gateway/` | App/CLI/桌面/远程客户端的统一入口：协议适配、中间件与路由。 | 插件业务、运行时启动。 |
 | `apps/` / `services/` | 最终产品入口或可独立部署的服务。 | 共享运行时库。 |
 | `tests/` | 对以上边界进行单元、集成和契约验证。 | 生产实现。 |
 
 ## 依赖方向
 
 ```text
-apps/、services/、cli/、examples/
+apps/、services/、cli/、examples/、gateway/
              ↓
 modules/、plugins/、sdk/、adapters/
              ↓
@@ -54,6 +58,8 @@ runtime/core
 - `runtime/core` 是最内层稳定模型，不依赖 SDK、模块、插件或应用。
 - `runtime/services`、`runtime/ipc` 和 `runtime/host-api` 构建于核心模型之上。
 - `engine/` 与 `adapters/` 接入执行载体；`sdk/` 负责面向语言的开发体验。
+- `gateway/` 与 `apps/`、`cli/` 同类，消费运行时服务与插件管理器，不实现底层协议或加载插件。
+- `developer-kit/` 是发行边界而非运行时依赖，定义 CLI、SDK、模板与本地开发宿主如何一起交付。
 - `modules/`、`plugins/`、`cli/`、`apps/`、`services/` 和 `examples/` 只能向下依赖，不能反向依赖具体产品入口。
 
 ## 当前状态与新增代码

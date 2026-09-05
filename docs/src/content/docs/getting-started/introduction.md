@@ -46,6 +46,24 @@ Building a pluggable platform by hand is expensive: you must design a plugin pro
 - No new programming language.
 - No re-inventing mature infrastructure: JSON-RPC 2.0 for transport, Wasmtime for Wasm, Kubernetes Operators for orchestration, and Bazel for build.
 
+## How it compares
+
+Existing plugin platforms each leave holes — a frozen long-tail of SDKs, a single carrier, no multi-tenancy. Here is where OriginLang answers them:
+
+| Dimension | Extism | wasmCloud | Tauri v2 | Eclipse Theia | PF4J | TEN | OriginLang |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Plugin languages | 10+ (long tail frozen) | 5 (Java early) | Rust only | TS/JS only | JVM only | C++/Go/Python | 6 languages in lockstep (Go/Rust/Java/Python/C++/TS) |
+| Host languages | 16+ (long tail frozen) | Rust/Go CLI mostly | Rust only | Node only | Java only | C++/Go mostly | 6 languages in lockstep |
+| Frontend UI extensions | No | No | Yes (Rust backend required) | Yes (TS, IDE-scoped) | No | No | Web Components + Module Federation, framework-agnostic |
+| Four carriers coexist | Wasm only | Wasm components only | Compile-time Rust crate | npm package (compile-time) | jar only (JVM) | Native modules | Wasm / subprocess / native lib / remote under one lifecycle |
+| Runtime hot reload | Yes | Yes | No (compile-time binding) | Partial (dev mode) | Yes | Yes | Yes, for all four carriers |
+| Fine-grained capability permissions | Wasm-level only | WASI deny-by-default | Command-level only | Workspace-level only | None built in | Simple | Three layers: manifest + tenant grant + user RBAC + quota |
+| First-class multi-tenancy | No | No | No | No | No | No | Built-in: visibility / quota / metering / instance isolation |
+| Plugin-level observability | No | Basic traces | No | Sparse | No | Strong in real-time scenarios | Zero-config metrics / logs / traces / slow-plugin profiling |
+| Dependency version management | DIY | Component composition (no SAT) | Via Cargo | npm dependency hell | Simple + Maven conflicts | None | SAT solver + semver + canary + rollback |
+| Deployment shapes | Server / Edge / CLI / IoT | Cloud / Edge K8s | Desktop / mobile app | Browser / Electron | JVM server | Server / SDK | All: standalone / K8s / desktop (Tauri) / mobile / edge / IDE (Theia) |
+| Positioning | General Wasm plugin system | K8s-grade Wasm microservice platform | Cross-platform app framework | IDE / dev-tool platform | Java server modularization | Real-time AI agent framework | General polyglot plugin platform foundation (all scenarios) |
+
 ## Current status
 
-The repository currently provides the directory skeleton for the runtime (`core`, `services`, `ipc`, and `host-api`), execution engine, adapters, SDKs, CLI, modules, plugins, and examples. These boundaries guide implementation; concrete language SDKs and deployable hosts are added as their contracts land. Start with the [Project Structure](project-structure/) tour.
+The repository currently provides the directory skeleton for the runtime (`core`, `services`, `ipc`, and `host-api`), execution engine, adapters, SDKs, CLI, modules, plugins, examples, the [Gateway](../architecture/gateway/), and the [Developer Kit](../reference/developer-kit/). These boundaries guide implementation; concrete language SDKs and deployable hosts are added as their contracts land. Start with the [Project Structure](project-structure/) tour.

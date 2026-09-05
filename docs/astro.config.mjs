@@ -56,6 +56,11 @@ export default defineConfig({
 							translations: { zh: '传输层' },
 							link: 'architecture/transports',
 						},
+						{
+							label: 'Gateway',
+							translations: { zh: '网关' },
+							link: 'architecture/gateway',
+						},
 					],
 				},
 				{
@@ -112,6 +117,11 @@ export default defineConfig({
 							label: 'CLI',
 							translations: { zh: '命令行工具' },
 							link: 'reference/cli',
+						},
+						{
+							label: 'Developer Kit',
+							translations: { zh: '开发者工具包' },
+							link: 'reference/developer-kit',
 						},
 					],
 				},

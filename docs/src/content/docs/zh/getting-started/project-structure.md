@@ -17,10 +17,12 @@ originlang/
 ├── engine/               # 解释器、字节码或执行引擎
 ├── adapters/             # Node.js、Python、WASM 等适配层
 ├── sdk/                  # 各语言 SDK
-├── cli/                  # 命令行工具
+├── cli/                  # 命令行工具（ol、插件脚手架）
+├── developer-kit/        # 面向插件开发者的发行边界
 ├── modules/              # 可独立版本化的官方模块
 ├── plugins/              # 官方插件
 ├── examples/             # 示例
+├── gateway/              # App / CLI / 桌面 / 远程客户端的统一入口层
 ├── apps/                 # 可执行应用（CLI 工具、独立程序）
 ├── services/             # 可部署服务 / 守护进程
 ├── tests/                # 测试（与运行时布局对应）
@@ -38,9 +40,11 @@ originlang/
 | `adapters/` | 适配层，接入非核心运行时——Node.js、Python、WASM 等，使其他生态的插件也能被加载。 |
 | `sdk/` | 各语言 SDK：先是参考实现的 Go SDK，随后是 Rust、Java、Python、C++、TypeScript。 |
 | `cli/` | 命令行工具（`ol`）：`init` / `build` / `run` / `test` 等插件开发工作流。 |
+| `developer-kit/` | 面向插件开发者的发行边界：CLI、各语言 SDK、manifest schema、模板与本地开发宿主，均独立版本化。见[开发者工具包](../reference/developer-kit/)。 |
 | `modules/` | 可独立发布与版本化的官方模块。 |
 | `plugins/` | OriginLang 团队维护的官方插件。 |
 | `examples/` | 可运行的宿主与插件示例。 |
+| `gateway/` | 统一入口层：把 HTTP、gRPC、WebSocket、本地 IPC 与 CLI 调用适配为统一的请求模型，转交宿主的稳定服务接口。见[网关](../architecture/gateway/)。 |
 | `apps/` | 最终可执行入口点：CLI 工具与独立程序，每个子目录对应一个可运行程序。 |
 | `services/` | 可部署的网络服务与守护进程，每个子目录可独立部署。 |
 | `tests/` | 单元与集成测试，与运行时布局一一对应。 |
@@ -54,7 +58,7 @@ originlang/
 ## 依赖方向
 
 ```
-apps/ · services/ · cli/ · examples/
+apps/ · services/ · cli/ · examples/ · gateway/
                  │
                  ▼
 modules/ · plugins/ · sdk/ · adapters/
@@ -67,7 +71,9 @@ runtime/core
 ```
 
 - 宿主依赖 `runtime/` 核心，获得插件生命周期与 IPC 能力。
+- `gateway/`（与 `apps/`、`cli/` 同类）消费 `runtime/services` 与插件管理器；不得自行实现底层协议，也不加载插件。
 - `sdk/`、`adapters/`、`cli/` 构建在运行时之上，供宿主消费。
+- `developer-kit/` 是发行边界，而非运行时依赖：它描述 CLI、SDK、manifest schema、模板与本地开发宿主如何一起交付。
 - `modules/` 与 `plugins/` 在 SDK/运行时之上打包，可独立版本化。
 - `tests/` 直接验证运行时行为。
 

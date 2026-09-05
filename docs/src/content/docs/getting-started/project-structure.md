@@ -17,10 +17,12 @@ originlang/
 ├── engine/               # Interpreter, bytecode or execution engine
 ├── adapters/             # Node.js, Python, WASM and other adapter layers
 ├── sdk/                  # Per-language SDKs
-├── cli/                  # Command-line tooling
+├── cli/                  # Command-line tooling (ol, plugin scaffolding)
+├── developer-kit/        # The plugin-developer distribution boundary
 ├── modules/              # Officially versioned modules
 ├── plugins/              # Official plugins
 ├── examples/             # Examples
+├── gateway/              # Unified entry layer for apps, CLI, desktop, remote clients
 ├── apps/                 # Executable applications (CLI tools, standalone programs)
 ├── services/             # Deployable services / daemons
 ├── tests/                # Tests (mirrors the runtime layout)
@@ -38,9 +40,11 @@ originlang/
 | `adapters/` | Adapter layers that integrate non-core runtimes — Node.js, Python, WASM, and more — so plugins written in other ecosystems can be loaded. |
 | `sdk/` | Per-language SDKs: the reference Go SDK first, followed by Rust, Java, Python, C++, and TypeScript. |
 | `cli/` | The command-line tool (`ol`) with `init` / `build` / `run` / `test` style workflows for plugin development. |
+| `developer-kit/` | The plugin-developer distribution boundary: CLI, per-language SDKs, manifest schema, templates, and a local development host, each versioned independently. See the [Developer Kit](../reference/developer-kit/) page. |
 | `modules/` | Officially versioned modules that can be released and versioned independently. |
 | `plugins/` | Official plugins maintained by the OriginLang team. |
 | `examples/` | Runnable example hosts and plugins. |
+| `gateway/` | The unified entry layer: adapts HTTP, gRPC, WebSocket, local IPC, and CLI calls into one request model for the host's stable services. See the [Gateway](../architecture/gateway/) page. |
 | `apps/` | Final executable entry points: CLI tools and standalone programs. Each subdirectory is one runnable program. |
 | `services/` | Deployable network services and daemons. Each subdirectory is independently deployable. |
 | `tests/` | Unit and integration tests, mirroring the runtime layout. |
@@ -54,7 +58,7 @@ The directories above define the intended ownership boundaries. Several are curr
 ## Dependency direction
 
 ```
-apps/ · services/ · cli/ · examples/
+apps/ · services/ · cli/ · examples/ · gateway/
                  │
                  ▼
 modules/ · plugins/ · sdk/ · adapters/
@@ -67,7 +71,9 @@ runtime/core
 ```
 
 - Hosts depend on the `runtime/` core for plugin lifecycle and IPC.
+- `gateway/` (like `apps/` and `cli/`) consumes `runtime/services` and the plugin manager; it must not re-implement lower-level protocols or load plugins itself.
 - SDKs (`sdk/`), adapters (`adapters/`), and the CLI (`cli/`) build on the runtime and are consumed by hosts.
+- `developer-kit/` is a distribution boundary, not a runtime dependency: it describes how CLI, SDKs, manifest schema, templates, and the local development host ship together.
 - `modules/` and `plugins/` are packaged on top of the SDK/runtime and can be independently versioned.
 - `tests/` exercises the runtime directly.
 
